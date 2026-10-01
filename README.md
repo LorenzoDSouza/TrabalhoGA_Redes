@@ -6,7 +6,7 @@ Trabalho GA — Redes de Computadores, UNISINOS 2026/2.
 ---
 
 ## Link para a vídeo da execução:
-https://www.youtube.com/watch?v=V0p6E5vajhI&t=24s
+[![Execução Trabalho Grau A Redes]([https://youtube.com](https://www.youtube.com/watch?v=V0p6E5vajhI&t=24s))]([https://youtube.com](https://www.youtube.com/watch?v=V0p6E5vajhI&t=24s))
 
 ## Topologia
 

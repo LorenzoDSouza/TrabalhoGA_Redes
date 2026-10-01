@@ -1,9 +1,12 @@
-# routing-lab
+# Trabalho Grau A - Redes de Computadores II
 
 Laboratório de roteamento em containers Docker com FRRouting (FRR).  
 Trabalho GA — Redes de Computadores, UNISINOS 2026/2.
 
 ---
+
+## Link para a vídeo da execução:
+https://www.youtube.com/watch?v=V0p6E5vajhI&t=24s
 
 ## Topologia
 

@@ -1,0 +1,52 @@
+version: '3.8'
+x-custom-router: &custom-router
+  build: ./custom_routing
+  image: pvrt-router:latest
+  privileged: true
+  restart: unless-stopped
+  sysctls:
+    - net.ipv4.ip_forward=1
+    - net.ipv4.conf.all.forwarding=1
+    - net.ipv4.conf.all.rp_filter=0
+    - net.ipv4.conf.default.rp_filter=0
+
+services:
+  r1:
+    <<: *custom-router
+    container_name: r1
+    hostname: r1
+    environment:
+      - ROUTER_ID=R1
+    volumes: []
+
+  r2:
+    <<: *custom-router
+    container_name: r2
+    hostname: r2
+    environment:
+      - ROUTER_ID=R2
+    volumes: []
+
+  r3:
+    <<: *custom-router
+    container_name: r3
+    hostname: r3
+    environment:
+      - ROUTER_ID=R3
+    volumes: []
+
+  r4:
+    <<: *custom-router
+    container_name: r4
+    hostname: r4
+    environment:
+      - ROUTER_ID=R4
+    volumes: []
+
+  r5:
+    <<: *custom-router
+    container_name: r5
+    hostname: r5
+    environment:
+      - ROUTER_ID=R5
+    volumes: []

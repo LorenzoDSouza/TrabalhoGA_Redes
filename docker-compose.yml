@@ -1,0 +1,213 @@
+version: '3.8'
+
+x-router: &router
+  image: frrouting/frr:latest
+  privileged: true
+  restart: unless-stopped
+  sysctls:
+    - net.ipv4.ip_forward=1
+    - net.ipv4.conf.all.forwarding=1
+    - net.ipv4.conf.all.rp_filter=0
+    - net.ipv4.conf.default.rp_filter=0
+
+x-host: &host
+  image: nicolaka/netshoot:latest
+  restart: unless-stopped
+  cap_add:
+    - NET_ADMIN
+
+networks:
+  net_r1r2:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.0.12.0/29
+  net_r1r5:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.0.15.0/29
+  net_r2r3:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.0.23.0/29
+  net_r2r4:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.0.24.0/29
+  net_r3r4:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.0.34.0/29
+  net_r3r5:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.0.35.0/29
+  net_r4r5:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.0.45.0/29
+  net_h1:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 192.168.1.0/24
+          gateway: 192.168.1.254
+  net_h2:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 192.168.2.0/24
+          gateway: 192.168.2.254
+  net_h3:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 192.168.3.0/24
+          gateway: 192.168.3.254
+  net_h4:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 192.168.4.0/24
+          gateway: 192.168.4.254
+  net_h5:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 192.168.5.0/24
+          gateway: 192.168.5.254
+
+services:
+
+  r1:
+    <<: *router
+    container_name: r1
+    hostname: r1
+    volumes:
+      - ./configs/${PROTOCOL:-ospf}/r1:/etc/frr
+    networks:
+      net_r1r2:
+        ipv4_address: 10.0.12.2
+      net_r1r5:
+        ipv4_address: 10.0.15.2
+      net_h1:
+        ipv4_address: 192.168.1.1
+
+  r2:
+    <<: *router
+    container_name: r2
+    hostname: r2
+    volumes:
+      - ./configs/${PROTOCOL:-ospf}/r2:/etc/frr
+    networks:
+      net_r1r2:
+        ipv4_address: 10.0.12.3
+      net_r2r3:
+        ipv4_address: 10.0.23.2
+      net_r2r4:
+        ipv4_address: 10.0.24.2
+      net_h2:
+        ipv4_address: 192.168.2.1
+
+  r3:
+    <<: *router
+    container_name: r3
+    hostname: r3
+    volumes:
+      - ./configs/${PROTOCOL:-ospf}/r3:/etc/frr
+    networks:
+      net_r2r3:
+        ipv4_address: 10.0.23.3
+      net_r3r4:
+        ipv4_address: 10.0.34.2
+      net_r3r5:
+        ipv4_address: 10.0.35.2
+      net_h3:
+        ipv4_address: 192.168.3.1
+
+  r4:
+    <<: *router
+    container_name: r4
+    hostname: r4
+    volumes:
+      - ./configs/${PROTOCOL:-ospf}/r4:/etc/frr
+    networks:
+      net_r2r4:
+        ipv4_address: 10.0.24.3
+      net_r3r4:
+        ipv4_address: 10.0.34.3
+      net_r4r5:
+        ipv4_address: 10.0.45.2
+      net_h4:
+        ipv4_address: 192.168.4.1
+
+  r5:
+    <<: *router
+    container_name: r5
+    hostname: r5
+    volumes:
+      - ./configs/${PROTOCOL:-ospf}/r5:/etc/frr
+    networks:
+      net_r1r5:
+        ipv4_address: 10.0.15.3
+      net_r3r5:
+        ipv4_address: 10.0.35.3
+      net_r4r5:
+        ipv4_address: 10.0.45.3
+      net_h5:
+        ipv4_address: 192.168.5.1
+
+
+
+
+
+  h1:
+    <<: *host
+    container_name: h1
+    hostname: h1
+    networks:
+      net_h1:
+        ipv4_address: 192.168.1.10
+    entrypoint: ["/bin/sh", "-c", "ip route del default 2>/dev/null || true; ip route add default via 192.168.1.1; sleep infinity"]
+
+  h2:
+    <<: *host
+    container_name: h2
+    hostname: h2
+    networks:
+      net_h2:
+        ipv4_address: 192.168.2.10
+    entrypoint: ["/bin/sh", "-c", "ip route del default 2>/dev/null || true; ip route add default via 192.168.2.1; sleep infinity"]
+
+  h3:
+    <<: *host
+    container_name: h3
+    hostname: h3
+    networks:
+      net_h3:
+        ipv4_address: 192.168.3.10
+    entrypoint: ["/bin/sh", "-c", "ip route del default 2>/dev/null || true; ip route add default via 192.168.3.1; sleep infinity"]
+
+  h4:
+    <<: *host
+    container_name: h4
+    hostname: h4
+    networks:
+      net_h4:
+        ipv4_address: 192.168.4.10
+    entrypoint: ["/bin/sh", "-c", "ip route del default 2>/dev/null || true; ip route add default via 192.168.4.1; sleep infinity"]
+
+  h5:
+    <<: *host
+    container_name: h5
+    hostname: h5
+    networks:
+      net_h5:
+        ipv4_address: 192.168.5.10
+    entrypoint: ["/bin/sh", "-c", "ip route del default 2>/dev/null || true; ip route add default via 192.168.5.1; sleep infinity"]
